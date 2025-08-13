@@ -1,10 +1,15 @@
+#ifndef VEHICULO_H
+#define VEHICULO_H
+
 typedef struct {
     int id;
     int direccion; // 0=norte, 1=sur, 2=este, 3=oeste
-    float velocidad; // m/s
-    float posicion;  // distancia a la intersección
-    int en_interseccion; // booleano
+    float velocidad;
+    float posicion;
+    int en_interseccion;
 } Vehiculo;
+
+#endif
 
 /*
 

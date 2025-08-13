@@ -1,17 +1,9 @@
+#include "interseccion.h"
+#include <stdio.h>
 
-
-typedef struct {
-    Semaforo semaforos[4]; // norte, sur, este, oeste
-    Vehiculo* vehiculos;
-    int num_vehiculos;
-} Interseccion;
-
-
-/*
-Comportamiento 
-
--Coordina semáforos.
--Determina qué vehículos pueden pasar.
--Detecta colisiones (si las simulas).
-
-*/
+void inicializarInterseccion(Interseccion* inter) {
+    for (int i = 0; i < 4; i++) {
+        inter->semaforos[i].estado = ROJO;
+    }
+    printf("Interseccion inicializada con semaforos en ROJO\n");
+}

@@ -1,3 +1,4 @@
+
 typedef enum { ROJO, AMARILLO, VERDE } EstadoSemaforo;
 
 typedef struct {
