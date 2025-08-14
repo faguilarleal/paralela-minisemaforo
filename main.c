@@ -27,7 +27,7 @@ typedef struct {
 } Intersection;
 
 char *light_colors[3] = {"Rojo (0)", "Verde (1)", "Amarillo (2)"};
-omp_lock_t sem_lock;
+omp_lock_t sem_lock; // es un tipo definido por OpenMP para manejar bloqueos mutuos.
 
 // -------------------- Funciones --------------------
 
