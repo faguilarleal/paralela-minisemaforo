@@ -46,19 +46,29 @@ void move_vehicles(Vehicle *vehicles, int num_vehicles, TrafficLight *lights) {
     #pragma omp parallel for
     for (int i = 0; i < num_vehicles; i++) {
         if (!vehicles[i].has_crossed) {
-            omp_set_lock(&sem_lock);   // bloqueo antes de leer
+            // Leer estado del semáforo
+            omp_set_lock(&sem_lock);
             int light_state = lights[vehicles[i].light_id].state;
-            omp_unset_lock(&sem_lock); // desbloqueo
+            omp_unset_lock(&sem_lock);
 
-            if (light_state != 0) { // No está en rojo
+            // Mover vehículo si el semáforo no está en rojo
+            if (light_state != 0) {
                 vehicles[i].position += vehicles[i].speed;
-                if (vehicles[i].position >= 5) { // 5 = posición de la intersección
+                if (vehicles[i].position >= 5) {
                     vehicles[i].has_crossed = 1;
                 }
             }
+
+            // Imprimir estado del vehículo de manera segura
+            omp_set_lock(&sem_lock);
+            printf("Vehículo %d- posición: %d, semáforo: %d, ha_cruzado: %d \n",
+                   vehicles[i].id+1, vehicles[i].position,light_state,
+                   vehicles[i].has_crossed);
+            omp_unset_lock(&sem_lock);
         }
     }
 }
+
 
 void simulate_traffic_dynamic(int num_iterations, Intersection *intersection) {
     omp_set_dynamic(1); // permitir ajuste dinámico de hilos
@@ -69,26 +79,29 @@ void simulate_traffic_dynamic(int num_iterations, Intersection *intersection) {
 
         #pragma omp parallel sections
         {
+            printf("\nIteración %d:\n", i + 1);
+
             #pragma omp section
             update_traffic_lights(intersection->lights, intersection->num_lights);
+            for (int l = 0; l < intersection->num_lights; l++) {
+                printf("Semáforo %d - Estado: %s\n", l, light_colors[intersection->lights[l].state]);
+            }
+
 
             #pragma omp section
             move_vehicles(intersection->vehicles, intersection->num_vehicles, intersection->lights);
+            // Mostrar estado
+            // for (int v = 0; v < intersection->num_vehicles; v++) {
+            //     printf("Vehículo %d - Posición: %d Semaforo: %d %s\n",
+            //         intersection->vehicles[v].id,
+            //         intersection->vehicles[v].position,
+            //         intersection->vehicles[v].light_id,
+            //         intersection->vehicles[v].has_crossed ? "(Cruzó)" : "");
+            // }
         }
 
-        // Mostrar estado
-        printf("\nIteración %d:\n", i + 1);
-        for (int v = 0; v < intersection->num_vehicles; v++) {
-            printf("Vehículo %d - Posición: %d Semaforo: %d %s\n",
-                   intersection->vehicles[v].id,
-                   intersection->vehicles[v].position,
-                   intersection->vehicles[v].light_id,
-                   intersection->vehicles[v].has_crossed ? "(Cruzó)" : "");
-        }
-        for (int l = 0; l < intersection->num_lights; l++) {
-            printf("Semáforo %d - Estado: %s\n", l, light_colors[intersection->lights[l].state]);
-        }
-
+        
+        
         sleep(1);
     }
 }
@@ -99,8 +112,8 @@ int main() {
     srand(1);     
     omp_init_lock(&sem_lock);
 
-    int num_vehicles = 6;
-    int num_lights = 2;
+    int num_vehicles = 200000;
+    int num_lights = 500;
 
     Vehicle *vehicles = malloc(num_vehicles * sizeof(Vehicle));
     TrafficLight *lights = malloc(num_lights * sizeof(TrafficLight));
@@ -123,7 +136,7 @@ int main() {
     Intersection intersection = {vehicles, num_vehicles, lights, num_lights};
 
     // Ejecutar simulación
-    simulate_traffic_dynamic(17, &intersection);
+    simulate_traffic_dynamic(50, &intersection);
 
     // Liberar memoria
     free(vehicles);

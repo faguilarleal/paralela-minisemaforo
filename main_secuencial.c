@@ -86,8 +86,8 @@ int main() {
     srand(1);     
     omp_init_lock(&sem_lock);
 
-    int num_vehicles = 6;
-    int num_lights = 2;
+    int num_vehicles = 200000;
+    int num_lights = 500;
 
     Vehicle *vehicles = malloc(num_vehicles * sizeof(Vehicle));
     TrafficLight *lights = malloc(num_lights * sizeof(TrafficLight));
@@ -110,7 +110,7 @@ int main() {
     Intersection intersection = {vehicles, num_vehicles, lights, num_lights};
 
     // Ejecutar simulación
-    simulate_traffic_dynamic(17, &intersection);
+    simulate_traffic_dynamic(50, &intersection);
 
     // Liberar memoria
     free(vehicles);
